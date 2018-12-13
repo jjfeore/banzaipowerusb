@@ -23,23 +23,22 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
     def on_welcome(self, c, e):
         print('Joining ' + self.channel)
-
-        # You must request specific capabilities before you can use them
         c.cap('REQ', ':twitch.tv/membership')
         c.cap('REQ', ':twitch.tv/tags')
         c.cap('REQ', ':twitch.tv/commands')
         c.join(self.channel)
 
     def on_pubmsg(self, c, e):
-
         # If a chat message starts with an exclamation point, try to run it as a command
         if e.arguments[0][:1] == '!':
             cmd = e.arguments[0].split(' ')[0][1:]
+            args = e.arguments[0].split(' ')[1:]
+            user = e.arguments
             print('Received command: ' + cmd)
-            self.do_command(e, cmd)
+            self.do_command(e, cmd, args)
         return
 
-    def do_command(self, e, cmd):
+    def do_command(self, e, cmd, args):
         c = self.connection
 
         # Poll the API to get current game.
@@ -60,13 +59,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         elif cmd == 'raffle':
             message = 'This is an example bot, replace this text with your raffle text.'
             c.privmsg(self.channel, message)
-        elif cmd == 'schedule':
-            message = 'This is an example bot, replace this text with your schedule text.'            
-            c.privmsg(self.channel, message)
-
-        # The command was not recognized
-        else:
-            c.privmsg(self.channel, 'Did not understand command: ' + cmd)
+        
+        elif cmd == 'secretword':
+            print('nothin yet')
 
 def main():
     if len(sys.argv) != 5:
@@ -83,7 +78,6 @@ def main():
 
 def toggle_port(port_num):
     toggle_letter = 'a'
-
     if port_num == 2:
         toggle_letter = 'b'
     elif port_num == 3:
